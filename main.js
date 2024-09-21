@@ -5,6 +5,8 @@ var MyPromise = /** @class */ (function () {
     function MyPromise(fn) {
         this.status = MyPromise.PENDING;
         this.result = null;
+        this.resolveCbs = [];
+        this.rejectCbs = [];
         try {
             fn(this.resolve.bind(this), this.reject.bind(this));
         }
@@ -13,27 +15,48 @@ var MyPromise = /** @class */ (function () {
         }
     }
     MyPromise.prototype.resolve = function (value) {
-        // 判断当前状态
-        if (this.status === MyPromise.PENDING) {
-            this.status = MyPromise.FULFILLED;
-            this.result = value;
-        }
+        var _this = this;
+        setTimeout(function () {
+            // 判断当前状态
+            if (_this.status === MyPromise.PENDING) {
+                _this.status = MyPromise.FULFILLED;
+                _this.result = value;
+                _this.resolveCbs.forEach(function (cb) {
+                    cb(value);
+                });
+            }
+        });
     };
     MyPromise.prototype.reject = function (reason) {
-        // 判断当前状态
-        if (this.status === MyPromise.PENDING) {
-            this.status = MyPromise.REJECTED;
-            this.result = reason;
-        }
+        var _this = this;
+        setTimeout(function () {
+            // 判断当前状态
+            if (_this.status === MyPromise.PENDING) {
+                _this.status = MyPromise.REJECTED;
+                _this.result = reason;
+                _this.resolveCbs.forEach(function (cb) {
+                    cb(reason);
+                });
+            }
+        });
     };
     MyPromise.prototype.then = function (onFulfilled, onRejected) {
+        var _this = this;
         onFulfilled = isFn(onFulfilled) ? onFulfilled : function () { };
         onRejected = isFn(onRejected) ? onRejected : function () { };
+        if (this.status === MyPromise.PENDING) {
+            this.resolveCbs.push(onFulfilled);
+            this.rejectCbs.push(onRejected);
+        }
         if (this.status === MyPromise.FULFILLED) {
-            onFulfilled(this.result);
+            setTimeout(function () {
+                onFulfilled(_this.result);
+            });
         }
         if (this.status === MyPromise.REJECTED) {
-            onRejected(this.result);
+            setTimeout(function () {
+                onRejected(_this.result);
+            });
         }
     };
     // 三个状态常量

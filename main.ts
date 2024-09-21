@@ -9,38 +9,62 @@ class MyPromise {
   static REJECTED = 'rejected' as const
   status: 'pending' | 'fulfilled' | 'rejected'
   result: any
+  resolveCbs: Function[]
+  rejectCbs: Function[]
   constructor(fn: Function) {
     this.status = MyPromise.PENDING
     this.result = null
+    this.resolveCbs = []
+    this.rejectCbs = []
     try {
       fn(this.resolve.bind(this), this.reject.bind(this))
     } catch (e) {
       this.reject(e)
     }
   }
+  
   resolve(value: any) {
-    // 判断当前状态
-    if (this.status === MyPromise.PENDING) {
-      this.status = MyPromise.FULFILLED
-      this.result = value
-    }
+    setTimeout(() => {
+      // 判断当前状态
+      if (this.status === MyPromise.PENDING) {
+        this.status = MyPromise.FULFILLED
+        this.result = value
+        this.resolveCbs.forEach(cb => {
+          cb(value)
+        })
+      }
+    })
   }
+
   reject(reason: any) {
-    // 判断当前状态
-    if (this.status === MyPromise.PENDING) {
-      this.status = MyPromise.REJECTED
-      this.result = reason
-    }
+    setTimeout(() => {
+      // 判断当前状态
+      if (this.status === MyPromise.PENDING) {
+        this.status = MyPromise.REJECTED
+        this.result = reason
+        this.resolveCbs.forEach(cb => {
+          cb(reason)
+        })
+      }
+    })
   }
 
   then(onFulfilled: any, onRejected: any) {
     onFulfilled = isFn(onFulfilled) ? onFulfilled : () => { }
     onRejected = isFn(onRejected) ? onRejected : () => { }
+    if (this.status === MyPromise.PENDING) {
+      this.resolveCbs.push(onFulfilled)
+      this.rejectCbs.push(onRejected)
+    }
     if (this.status === MyPromise.FULFILLED) {
-      onFulfilled(this.result)
+      setTimeout(() => {
+        onFulfilled(this.result)
+      })
     }
     if (this.status === MyPromise.REJECTED) {
-      onRejected(this.result)
+      setTimeout(() => {
+        onRejected(this.result)
+      })
     }
   }
 }

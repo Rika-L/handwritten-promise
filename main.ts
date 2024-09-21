@@ -23,14 +23,26 @@ class MyPromise {
       this.status = MyPromise.REJECTED
       this.result = reason
     }
+  }
 
+  then(onFulfilled: Function, onRejected: Function) {
+    if (this.status === MyPromise.FULFILLED) {
+      onFulfilled(this.result)
+    }
+    if (this.status === MyPromise.REJECTED) {
+      onRejected(this.result)
+    }
   }
 }
 
 // 测试
 const p = new MyPromise((resolve: (value: any) => void, reject: (reason: any) => void) => {
-  setTimeout(() => {
-    resolve('success')
-  }, 1000)
+  resolve('success')
+})
+
+p.then((value: any) => {
+  console.log(value)
+}, (reason: any) => {
+  console.log(reason)
 })
 

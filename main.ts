@@ -1,3 +1,7 @@
+function isFn(fn: any): fn is Function {
+  return typeof fn === 'function'
+}
+
 class MyPromise {
   // 三个状态常量
   static PENDING = 'pending' as const
@@ -8,7 +12,11 @@ class MyPromise {
   constructor(fn: Function) {
     this.status = MyPromise.PENDING
     this.result = null
-    fn(this.resolve.bind(this), this.reject.bind(this))
+    try {
+      fn(this.resolve.bind(this), this.reject.bind(this))
+    } catch (e) {
+      this.reject(e)
+    }
   }
   resolve(value: any) {
     // 判断当前状态
@@ -25,7 +33,9 @@ class MyPromise {
     }
   }
 
-  then(onFulfilled: Function, onRejected: Function) {
+  then(onFulfilled: any, onRejected: any) {
+    onFulfilled = isFn(onFulfilled) ? onFulfilled : () => { }
+    onRejected = isFn(onRejected) ? onRejected : () => { }
     if (this.status === MyPromise.FULFILLED) {
       onFulfilled(this.result)
     }
@@ -40,9 +50,7 @@ const p = new MyPromise((resolve: (value: any) => void, reject: (reason: any) =>
   resolve('success')
 })
 
-p.then((value: any) => {
-  console.log(value)
-}, (reason: any) => {
+p.then(undefined, (reason: any) => {
   console.log(reason)
 })
 

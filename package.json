@@ -1,0 +1,12 @@
+{
+  "name": "promise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev":"ts-node main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

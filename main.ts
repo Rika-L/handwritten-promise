@@ -22,7 +22,7 @@ class MyPromise {
       this.reject(e)
     }
   }
-  
+
   resolve(value: any) {
     setTimeout(() => {
       // 判断当前状态
@@ -50,22 +50,24 @@ class MyPromise {
   }
 
   then(onFulfilled: any, onRejected: any) {
-    onFulfilled = isFn(onFulfilled) ? onFulfilled : () => { }
-    onRejected = isFn(onRejected) ? onRejected : () => { }
-    if (this.status === MyPromise.PENDING) {
-      this.resolveCbs.push(onFulfilled)
-      this.rejectCbs.push(onRejected)
-    }
-    if (this.status === MyPromise.FULFILLED) {
-      setTimeout(() => {
-        onFulfilled(this.result)
-      })
-    }
-    if (this.status === MyPromise.REJECTED) {
-      setTimeout(() => {
-        onRejected(this.result)
-      })
-    }
+    return new MyPromise((_resolve: (value: any) => void, _reject: (reason: any) => void) => {
+      onFulfilled = isFn(onFulfilled) ? onFulfilled : () => { }
+      onRejected = isFn(onRejected) ? onRejected : () => { }
+      if (this.status === MyPromise.PENDING) {
+        this.resolveCbs.push(onFulfilled)
+        this.rejectCbs.push(onRejected)
+      }
+      if (this.status === MyPromise.FULFILLED) {
+        setTimeout(() => {
+          onFulfilled(this.result)
+        })
+      }
+      if (this.status === MyPromise.REJECTED) {
+        setTimeout(() => {
+          onRejected(this.result)
+        })
+      }
+    })
   }
 }
 

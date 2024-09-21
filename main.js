@@ -42,22 +42,24 @@ var MyPromise = /** @class */ (function () {
     };
     MyPromise.prototype.then = function (onFulfilled, onRejected) {
         var _this = this;
-        onFulfilled = isFn(onFulfilled) ? onFulfilled : function () { };
-        onRejected = isFn(onRejected) ? onRejected : function () { };
-        if (this.status === MyPromise.PENDING) {
-            this.resolveCbs.push(onFulfilled);
-            this.rejectCbs.push(onRejected);
-        }
-        if (this.status === MyPromise.FULFILLED) {
-            setTimeout(function () {
-                onFulfilled(_this.result);
-            });
-        }
-        if (this.status === MyPromise.REJECTED) {
-            setTimeout(function () {
-                onRejected(_this.result);
-            });
-        }
+        return new MyPromise(function (_resolve, _reject) {
+            onFulfilled = isFn(onFulfilled) ? onFulfilled : function () { };
+            onRejected = isFn(onRejected) ? onRejected : function () { };
+            if (_this.status === MyPromise.PENDING) {
+                _this.resolveCbs.push(onFulfilled);
+                _this.rejectCbs.push(onRejected);
+            }
+            if (_this.status === MyPromise.FULFILLED) {
+                setTimeout(function () {
+                    onFulfilled(_this.result);
+                });
+            }
+            if (_this.status === MyPromise.REJECTED) {
+                setTimeout(function () {
+                    onRejected(_this.result);
+                });
+            }
+        });
     };
     // 三个状态常量
     MyPromise.PENDING = 'pending';
